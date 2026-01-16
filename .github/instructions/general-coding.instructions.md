@@ -13,7 +13,7 @@ applyTo: '**'
 - 使用单一职责原则
 - 使用别名路径引用，避免使用相对路径
 - 命名方式：
-  - 使用文件夹 + index.ts|tsx命名：`[功能模块名]/index.ts`
+  - 使用文件夹 + index.ts|tsx 命名：`[功能模块名]/index.ts`
   - 使用驼峰命名法，例如：`fileAPI/index.ts`
   - 使用驼峰命名组件，例如：`customComponent/index.tsx`
 
@@ -45,23 +45,18 @@ applyTo: '**'
 
 ## 文件目录
 
- - docs/: 项目相关文档，所有文档都应该存放在此目录下，文档包括但不限于：
-   - 产品需求文档
-   - 架构设计文档
-   - API 接口文档
-   - 规划与任务分解文档
- - apps/: 各个子应用，例如：
-   - web-draft-content: 测试应用
-   - web-geo: 核心创作平台
-   - web-geo-api: 创作平台后端服务
-   - web-portal: 官网和营销落地页
-   - web-admin: 超级管理员后台
-   - auth-server: 统一认证与授权服务
-   - desktop-studio: 桌面端壳
- - packages/: 共享包，例如：
-   - share-common: 通用工具库
-   - share-ui: 通用 UI 组件库
-   - share-frontend: 前端共享逻辑
-   - share-backend: 后端共享逻辑
- - .github/: CI/CD workflows 配置文件
- - scripts/: 构建与脚本工具
+- docs/: 项目相关文档，所有文档都应该存放在此目录下，文档包括但不限于：
+  - 产品需求文档
+  - 架构设计文档
+  - API 接口文档
+  - 规划与任务分解文档
+- apps/: 各个子应用，例如：
+  - web-portal: 官网和营销落地页
+  - web-admin: 超级管理员后台
+  - server-auth: 统一认证与授权服务
+- packages/: 共享包，例如：
+  - share-ui: 通用 UI 组件库
+  - share-frontend: 前端共享逻辑
+  - share-backend: 后端共享逻辑
+- .github/: CI/CD workflows 配置文件
+- scripts/: 构建与脚本工具
