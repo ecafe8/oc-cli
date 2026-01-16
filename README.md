@@ -80,3 +80,13 @@ oc sync package share-frontend
 # 同步 packages 目录下的共享库
 oc sync packages
 ```
+
+## 其他
+
+### 子模板仓库：
+
+[oc-template](https://github.com/ecafe8/oc-template)
+
+```bash
+git submodule add https://github.com/ecafe8/oc-template template
+```
