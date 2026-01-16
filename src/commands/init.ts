@@ -1,9 +1,9 @@
+import path from "node:path";
 import chalk from "chalk";
-import path from "path";
 import fs from "fs-extra";
 import ora from "ora";
 import prompts from "prompts";
-import { loadRegistry, getLocalTemplatePath, config } from "../utils/config";
+import { getLocalTemplatePath, loadRegistry } from "../utils/config";
 
 export async function init(projectName?: string) {
   let finalProjectName = projectName;

@@ -1,6 +1,6 @@
+import path from "node:path";
 import chalk from "chalk";
 import fs from "fs-extra";
-import path from "path";
 
 const TEMPLATE_DIR = path.resolve(process.cwd(), "template");
 const REGISTRY_PATH = path.resolve(process.cwd(), "registry.json");

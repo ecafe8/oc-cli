@@ -1,8 +1,8 @@
+import path from "node:path";
 import chalk from "chalk";
-import ora from "ora";
-import path from "path";
 import fs from "fs-extra";
-import { loadRegistry, getLocalTemplatePath } from "../utils/config";
+import ora from "ora";
+import { getLocalTemplatePath, loadRegistry } from "../utils/config";
 
 export async function sync(type?: string, name?: string) {
   const spinner = ora(`Syncing...`).start();

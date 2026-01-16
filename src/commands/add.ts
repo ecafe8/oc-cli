@@ -1,7 +1,7 @@
+import path from "node:path";
 import chalk from "chalk";
 import fs from "fs-extra";
 import ora from "ora";
-import path from "path";
 import { getLocalTemplatePath, loadRegistry, type RegistryItem } from "../utils/config";
 
 export async function add(type: string, templateName: string, targetName: string) {

@@ -1,6 +1,6 @@
-import path from "path";
-import fs from "fs-extra";
 import chalk from "chalk";
+import fs from "fs-extra";
+import path from "path";
 
 export const config = {
   registryUrl: "https://raw.githubusercontent.com/ecafe8/oc-cli/main",

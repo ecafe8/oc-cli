@@ -1,8 +1,8 @@
 import { program } from "commander";
-import { init } from "./commands/init";
-import { add } from "./commands/add";
-import { sync } from "./commands/sync";
 import { version } from "../package.json";
+import { add } from "./commands/add";
+import { init } from "./commands/init";
+import { sync } from "./commands/sync";
 
 program.name("oc").description("OC CLI - A scaffold and resource management tool").version(version);
 
