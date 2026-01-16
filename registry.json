@@ -1,0 +1,129 @@
+{
+  "template": {
+    "path": "template",
+    "files": [
+      "README.md",
+      "biome.json",
+      "bun.lock",
+      "package.json",
+      "tsconfig.json",
+      "turbo.json"
+    ]
+  },
+  "apps": {
+    "web-template": {
+      "name": "web-template",
+      "path": "template/apps/web-template",
+      "description": "",
+      "type": "app",
+      "dependencies": [
+        "@repo/share-frontend",
+        "@repo/share-ui",
+        "next",
+        "react",
+        "react-dom"
+      ],
+      "devDependencies": [
+        "@repo/biome-config",
+        "@repo/typescript-config",
+        "@tailwindcss/postcss",
+        "@types/node",
+        "@types/react",
+        "@types/react-dom",
+        "typescript"
+      ]
+    }
+  },
+  "packages": {
+    "biome-config": {
+      "name": "biome-config",
+      "path": "template/packages/biome-config",
+      "description": "",
+      "type": "package",
+      "dependencies": [],
+      "devDependencies": []
+    },
+    "typescript-config": {
+      "name": "typescript-config",
+      "path": "template/packages/typescript-config",
+      "description": "",
+      "type": "package",
+      "dependencies": [],
+      "devDependencies": []
+    },
+    "share-backend": {
+      "name": "share-backend",
+      "path": "template/packages/share-backend",
+      "description": "",
+      "type": "package",
+      "dependencies": [
+        "radash",
+        "uuid",
+        "zod"
+      ],
+      "devDependencies": [
+        "@types/node",
+        "@repo/biome-config",
+        "@repo/typescript-config",
+        "typescript"
+      ]
+    },
+    "share-frontend": {
+      "name": "share-frontend",
+      "path": "template/packages/share-frontend",
+      "description": "",
+      "type": "package",
+      "dependencies": [
+        "chroma-js",
+        "clsx",
+        "tailwind-merge",
+        "@repo/share-ui"
+      ],
+      "devDependencies": [
+        "@repo/biome-config",
+        "@repo/typescript-config",
+        "@types/chroma-js",
+        "@types/node",
+        "@types/react",
+        "@types/react-dom",
+        "typescript"
+      ]
+    },
+    "share-ui": {
+      "name": "share-ui",
+      "path": "template/packages/share-ui",
+      "description": "",
+      "type": "package",
+      "dependencies": [
+        "@base-ui-components/react",
+        "@radix-ui/react-dialog",
+        "@radix-ui/react-hover-card",
+        "@radix-ui/react-slot",
+        "@radix-ui/react-tooltip",
+        "@tanstack/react-table",
+        "class-variance-authority",
+        "clsx",
+        "cmdk",
+        "embla-carousel-react",
+        "input-otp",
+        "lucide",
+        "lucide-react",
+        "motion",
+        "radix-ui",
+        "react",
+        "react-dom",
+        "react-icons",
+        "tailwind-merge",
+        "tw-animate-css"
+      ],
+      "devDependencies": [
+        "@repo/biome-config",
+        "@repo/typescript-config",
+        "@types/node",
+        "@types/react",
+        "@types/react-dom",
+        "typescript"
+      ]
+    }
+  }
+}
