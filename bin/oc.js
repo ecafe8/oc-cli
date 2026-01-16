@@ -9509,8 +9509,8 @@ var chalkStderr = createChalk({ level: stderrColor ? stderrColor.level : 0 });
 var source_default = chalk;
 
 // src/commands/init.ts
-var import_fs_extra = __toESM(require_lib(), 1);
-import path from "path";
+var import_fs_extra2 = __toESM(require_lib(), 1);
+import path2 from "path";
 
 // node_modules/ora/index.js
 import process7 from "node:process";
@@ -10022,15 +10022,71 @@ function ora(options) {
   return new Ora(options);
 }
 
+// src/utils/config.ts
+var import_fs_extra = __toESM(require_lib(), 1);
+import path from "path";
+var __dirname = "/Volumes/SSD980/work/AI/web/O/oc-cli/src/utils";
+var config = {
+  registryUrl: "https://raw.githubusercontent.com/ecafe8/oc-cli/main",
+  localTemplatePath: path.resolve(__dirname, "../../template"),
+  localRegistryPath: path.resolve(__dirname, "../../registry.json")
+};
+async function loadRegistry() {
+  if (await import_fs_extra.default.pathExists(config.localRegistryPath)) {
+    try {
+      return await import_fs_extra.default.readJson(config.localRegistryPath);
+    } catch (e) {
+      console.warn(source_default.yellow("Found local registry.json but failed to parse it."));
+    }
+  }
+  try {
+    const res = await fetch(`${config.registryUrl}/registry.json`);
+    if (!res.ok)
+      throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (error) {
+    console.warn(source_default.yellow("Failed to load registry from remote."));
+    return null;
+  }
+}
+function getLocalTemplatePath(relativePath) {
+  const localPath = path.join(path.dirname(config.localRegistryPath), relativePath);
+  if (import_fs_extra.default.existsSync(localPath)) {
+    return localPath;
+  }
+  return null;
+}
+
 // src/commands/init.ts
 async function init(projectName) {
   const spinner = ora(`Initializing project ${projectName}...`).start();
   try {
-    const targetDir = path.resolve(process.cwd(), projectName);
-    if (await import_fs_extra.default.pathExists(targetDir)) {
-      spinner.fail(`Directory ${projectName} already exists.`);
+    const targetDir = path2.resolve(process.cwd(), projectName);
+    if (await import_fs_extra2.default.pathExists(targetDir)) {
+      const files = await import_fs_extra2.default.readdir(targetDir);
+      if (files.length > 0) {
+        spinner.fail(`Directory ${projectName} already exists and is not empty.`);
+      }
+    } else {
+      await import_fs_extra2.default.ensureDir(targetDir);
+    }
+    const registry = await loadRegistry();
+    if (!registry) {
+      spinner.fail("Could not load registry.");
       return;
     }
+    const templateFiles = registry.template.files;
+    const templatePath = registry.template.path;
+    for (const file of templateFiles) {
+      const sourcePath = getLocalTemplatePath(path2.join(templatePath, file));
+      if (sourcePath) {
+        await import_fs_extra2.default.copy(sourcePath, path2.join(targetDir, file));
+      } else {
+        spinner.warn(`Could not find local template file: ${file}, skipping remote download for now.`);
+      }
+    }
+    await import_fs_extra2.default.ensureDir(path2.join(targetDir, "apps"));
+    await import_fs_extra2.default.ensureDir(path2.join(targetDir, "packages"));
     spinner.succeed(source_default.green(`Project ${projectName} initialized successfully!`));
     console.log(source_default.blue(`
 cd ${projectName}
@@ -10038,33 +10094,104 @@ bun install
 `));
   } catch (error) {
     spinner.fail("Failed to initialize project.");
-    console.error(error);
+    console.error(error.message);
   }
 }
 
 // src/commands/add.ts
+var import_fs_extra3 = __toESM(require_lib(), 1);
+import path3 from "path";
 async function add(type, templateName, targetName) {
   const spinner = ora(`Adding ${type} ${templateName} as ${targetName}...`).start();
   try {
-    spinner.succeed(source_default.green(`${type} added successfully!`));
+    const registry = await loadRegistry();
+    if (!registry) {
+      spinner.fail("Could not load registry.");
+      return;
+    }
+    let templateItem;
+    if (type === "app") {
+      templateItem = registry.apps[templateName];
+    } else {
+      spinner.fail(`Unknown type: ${type}. Supported types: app`);
+      return;
+    }
+    if (!templateItem) {
+      spinner.fail(`Template ${templateName} not found in registry.`);
+      return;
+    }
+    const targetDir = path3.resolve(process.cwd(), "apps", targetName);
+    if (await import_fs_extra3.default.pathExists(targetDir)) {
+      spinner.fail(`Target directory apps/${targetName} already exists.`);
+      return;
+    }
+    const sourcePath = getLocalTemplatePath(templateItem.path);
+    if (sourcePath) {
+      await import_fs_extra3.default.copy(sourcePath, targetDir);
+    } else {
+      spinner.fail(`Could not find local template path: ${templateItem.path}. Remote download not fully implemented.`);
+      return;
+    }
+    const pkgPath = path3.join(targetDir, "package.json");
+    if (await import_fs_extra3.default.pathExists(pkgPath)) {
+      const pkg = await import_fs_extra3.default.readJson(pkgPath);
+      pkg.name = targetName;
+      await import_fs_extra3.default.writeJson(pkgPath, pkg, { spaces: 2 });
+    }
+    spinner.succeed(source_default.green(`${type} added successfully to apps/${targetName}!`));
   } catch (error) {
     spinner.fail("Failed to add resource.");
-    console.error(error);
+    console.error(error.message);
   }
 }
 
 // src/commands/sync.ts
+var import_fs_extra4 = __toESM(require_lib(), 1);
+import path4 from "path";
 async function sync(type, name) {
   const spinner = ora(`Syncing...`).start();
   try {
-    if (!type) {
-      spinner.info("No sync type specified.");
+    const registry = await loadRegistry();
+    if (!registry) {
+      spinner.fail("Could not load registry.");
       return;
     }
-    spinner.succeed(source_default.green(`Synced ${type} ${name || ""} successfully!`));
+    if (type === "packages") {
+      const packages = registry.packages;
+      for (const [pkgName, pkgItem] of Object.entries(packages)) {
+        await syncPackage(pkgItem.path, pkgName);
+      }
+      spinner.succeed(source_default.green(`Synced all packages successfully!`));
+      return;
+    }
+    if (type === "package") {
+      if (!name) {
+        spinner.fail("Package name is required for 'sync package'.");
+        return;
+      }
+      const pkgItem = registry.packages[name];
+      if (!pkgItem) {
+        spinner.fail(`Package ${name} not found in registry.`);
+        return;
+      }
+      await syncPackage(pkgItem.path, name);
+      spinner.succeed(source_default.green(`Synced package ${name} successfully!`));
+      return;
+    }
+    spinner.info("Usage: oc sync packages OR oc sync package <name>");
   } catch (error) {
     spinner.fail("Failed to sync.");
-    console.error(error);
+    console.error(error.message);
+  }
+}
+async function syncPackage(templatePath, pkgName) {
+  const targetDir = path4.resolve(process.cwd(), "packages", pkgName);
+  const sourcePath = getLocalTemplatePath(templatePath);
+  if (sourcePath) {
+    await import_fs_extra4.default.emptyDir(targetDir);
+    await import_fs_extra4.default.copy(sourcePath, targetDir);
+  } else {
+    console.warn(source_default.yellow(`Could not find local template for ${pkgName}. Remote download not implemented.`));
   }
 }
 // package.json

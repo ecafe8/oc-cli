@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "bun build ./src/index.ts --outfile ./bin/oc.js --target node",
-    "build:registry": "bun share-frontend src/build-registry.ts",
+    "build:registry": "bun src/build-registry.ts",
     "test": "bun test"
   },
   "keywords": [
