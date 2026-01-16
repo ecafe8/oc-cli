@@ -90,3 +90,11 @@ oc sync packages
 ```bash
 git submodule add git@github.com:ecafe8/oc-template.git template
 ```
+
+### 注意:
+
+因为 template 目录是作为子模块存在的,所以在克隆本仓库时请使用 --recursive 参数:
+
+```bash
+git clone --recursive
+```
