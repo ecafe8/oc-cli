@@ -1,14 +1,7 @@
 {
   "template": {
     "path": "template",
-    "files": [
-      "README.md",
-      "biome.json",
-      "bun.lock",
-      "package.json",
-      "tsconfig.json",
-      "turbo.json"
-    ]
+    "files": ["README.md", "biome.json", "bun.lock", "package.json", "tsconfig.json", "turbo.json"]
   },
   "apps": {
     "web-template": {
@@ -16,13 +9,7 @@
       "path": "template/apps/web-template",
       "description": "",
       "type": "app",
-      "dependencies": [
-        "@repo/share-frontend",
-        "@repo/share-ui",
-        "next",
-        "react",
-        "react-dom"
-      ],
+      "dependencies": ["@repo/share-frontend", "@repo/share-ui", "next", "react", "react-dom"],
       "devDependencies": [
         "@repo/biome-config",
         "@repo/typescript-config",
@@ -56,29 +43,15 @@
       "path": "template/packages/share-backend",
       "description": "",
       "type": "package",
-      "dependencies": [
-        "radash",
-        "uuid",
-        "zod"
-      ],
-      "devDependencies": [
-        "@types/node",
-        "@repo/biome-config",
-        "@repo/typescript-config",
-        "typescript"
-      ]
+      "dependencies": ["radash", "uuid", "zod"],
+      "devDependencies": ["@types/node", "@repo/biome-config", "@repo/typescript-config", "typescript"]
     },
     "share-frontend": {
       "name": "share-frontend",
       "path": "template/packages/share-frontend",
       "description": "",
       "type": "package",
-      "dependencies": [
-        "chroma-js",
-        "clsx",
-        "tailwind-merge",
-        "@repo/share-ui"
-      ],
+      "dependencies": ["chroma-js", "clsx", "tailwind-merge", "@repo/share-ui"],
       "devDependencies": [
         "@repo/biome-config",
         "@repo/typescript-config",

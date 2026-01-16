@@ -4,10 +4,7 @@ import { add } from "./commands/add";
 import { sync } from "./commands/sync";
 import { version } from "../package.json";
 
-program
-  .name("oc")
-  .description("OC CLI - A scaffold and resource management tool")
-  .version(version);
+program.name("oc").description("OC CLI - A scaffold and resource management tool").version(version);
 
 program
   .command("init")

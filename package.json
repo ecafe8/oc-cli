@@ -9,6 +9,8 @@
   "scripts": {
     "build": "tsc --outDir dist",
     "build:registry": "bun src/build-registry.ts",
+    "format": "biome format --write",
+    "lint": "biome check --write",
     "test": "bun test"
   },
   "keywords": [
@@ -19,6 +21,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@biomejs/biome": "^2.3.11",
     "chalk": "^5.3.0",
     "commander": "^11.0.0",
     "fs-extra": "^11.1.1",

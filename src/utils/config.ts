@@ -41,9 +41,9 @@ export async function loadRegistry(): Promise<Registry | null> {
 
   // 2. Fallback to remote registry
   try {
-     const res = await fetch(`${config.registryUrl}/registry.json`);
-     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-     return await res.json() as Registry;
+    const res = await fetch(`${config.registryUrl}/registry.json`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return (await res.json()) as Registry;
   } catch (error) {
     console.warn(chalk.yellow("Failed to load registry from remote."));
     return null;
@@ -55,9 +55,9 @@ export async function loadRegistry(): Promise<Registry | null> {
  * Returns null if not found locally.
  */
 export function getLocalTemplatePath(relativePath: string): string | null {
-    const localPath = path.join(path.dirname(config.localRegistryPath), relativePath);
-    if (fs.existsSync(localPath)) {
-        return localPath;
-    }
-    return null;
+  const localPath = path.join(path.dirname(config.localRegistryPath), relativePath);
+  if (fs.existsSync(localPath)) {
+    return localPath;
+  }
+  return null;
 }

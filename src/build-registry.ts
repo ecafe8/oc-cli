@@ -1,6 +1,6 @@
+import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";
-import chalk from "chalk";
 
 const TEMPLATE_DIR = path.resolve(process.cwd(), "template");
 const REGISTRY_PATH = path.resolve(process.cwd(), "registry.json");
@@ -37,12 +37,9 @@ async function getPackageInfo(dirPath: string) {
   return {};
 }
 
-async function scanDirectory(
-  baseDir: string, 
-  type: "app" | "package"
-): Promise<Record<string, RegistryItem>> {
+async function scanDirectory(baseDir: string, type: "app" | "package"): Promise<Record<string, RegistryItem>> {
   const items: Record<string, RegistryItem> = {};
-  
+
   if (!(await fs.pathExists(baseDir))) {
     return items;
   }
@@ -51,8 +48,8 @@ async function scanDirectory(
 
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
-    if (entry.name.startsWith('.')) continue;
-    
+    if (entry.name.startsWith(".")) continue;
+
     const fullPath = path.join(baseDir, entry.name);
     const relativePath = path.relative(process.cwd(), fullPath); // Use path relative to root
     const pkgInfo = await getPackageInfo(fullPath);
@@ -72,25 +69,25 @@ async function scanDirectory(
 
 // Scan root template files (excluding apps and packages directories)
 async function scanTemplateRoot(baseDir: string): Promise<TemplateRoot> {
-    const files: string[] = [];
-    if (!(await fs.pathExists(baseDir))) {
-        return { path: "template", files: [] };
-    }
+  const files: string[] = [];
+  if (!(await fs.pathExists(baseDir))) {
+    return { path: "template", files: [] };
+  }
 
-    const entries = await fs.readdir(baseDir, { withFileTypes: true });
-    for (const entry of entries) {
-        if (entry.name.startsWith('.')) continue; // Ignore hidden files like .DS_Store
-        // Ignore apps and packages directories calling them recursively not needed for root template
-        if (entry.isDirectory() && (entry.name === 'apps' || entry.name === 'packages')) continue;
-        
-        // We only want files or other config directories in root
-        files.push(entry.name);
-    }
-    
-    return {
-        path: "template",
-        files: files.sort()
-    };
+  const entries = await fs.readdir(baseDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.name.startsWith(".")) continue; // Ignore hidden files like .DS_Store
+    // Ignore apps and packages directories calling them recursively not needed for root template
+    if (entry.isDirectory() && (entry.name === "apps" || entry.name === "packages")) continue;
+
+    // We only want files or other config directories in root
+    files.push(entry.name);
+  }
+
+  return {
+    path: "template",
+    files: files.sort(),
+  };
 }
 
 async function main() {
