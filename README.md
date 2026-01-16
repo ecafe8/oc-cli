@@ -57,6 +57,12 @@ bun install
 bun build
 # 全局链接 CLI 工具
 bun link
+# 验证安装
+oc --version
+# 显示帮助信息
+oc --help
+# 运行测试
+bun test
 ```
 
 ### 2. 如何使用
