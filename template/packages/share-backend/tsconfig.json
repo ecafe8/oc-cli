@@ -1,0 +1,12 @@
+{
+	"extends": ["@repo/typescript-config/base.json"],
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@repo/share-backend/*": ["./src/*"]
+		},
+		"outDir": "dist"
+	},
+	"include": ["src"],
+	"exclude": ["dist", "build", "node_modules"]
+}
