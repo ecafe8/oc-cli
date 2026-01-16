@@ -22,17 +22,13 @@
       "dependencies": [
         "@repo/share-frontend",
         "@repo/share-ui",
-        "next",
-        "react",
-        "react-dom"
+        "next"
       ],
       "devDependencies": [
         "@repo/biome-config",
         "@repo/typescript-config",
         "@tailwindcss/postcss",
         "@types/node",
-        "@types/react",
-        "@types/react-dom",
         "typescript"
       ]
     }
@@ -87,8 +83,6 @@
         "@repo/typescript-config",
         "@types/chroma-js",
         "@types/node",
-        "@types/react",
-        "@types/react-dom",
         "typescript"
       ]
     },
@@ -113,8 +107,6 @@
         "lucide-react",
         "motion",
         "radix-ui",
-        "react",
-        "react-dom",
         "react-icons",
         "tailwind-merge",
         "tw-animate-css"
@@ -123,8 +115,6 @@
         "@repo/biome-config",
         "@repo/typescript-config",
         "@types/node",
-        "@types/react",
-        "@types/react-dom",
         "typescript"
       ]
     }
