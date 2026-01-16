@@ -4,23 +4,28 @@ import fs from "fs-extra";
 import ora from "ora";
 import { getLocalTemplatePath, loadRegistry } from "../utils/config";
 
-export async function sync(type?: string, name?: string) {
+interface PackageItem {
+  path: string;
+}
+
+interface Registry {
+  packages: Record<string, PackageItem>;
+  skills?: string[];
+}
+
+export async function sync(type?: string, name?: string): Promise<void> {
   const spinner = ora("Syncing...").start();
 
   try {
-    const registry = await loadRegistry();
+    const registry = (await loadRegistry()) as Registry | undefined;
     if (!registry) {
       spinner.fail("Could not load registry.");
       return;
     }
 
-    if (!type) {
-      // Sync all packages
-      const packages = registry.packages;
-      for (const [pkgName, pkgItem] of Object.entries(packages)) {
-        await syncPackage(pkgItem.path, pkgName);
-      }
-      spinner.succeed(chalk.green("Synced all packages successfully!"));
+    if (type === "skill") {
+      await syncSkills(registry);
+      spinner.succeed(chalk.green("Synced skills successfully!"));
       return;
     }
 
@@ -39,7 +44,17 @@ export async function sync(type?: string, name?: string) {
       return;
     }
 
-    spinner.info("Usage: oc sync OR oc sync package <name>");
+    if (!type) {
+      await syncSkills(registry);
+      const packages = registry.packages;
+      for (const [pkgName, pkgItem] of Object.entries(packages)) {
+        await syncPackage(pkgItem.path, pkgName);
+      }
+      spinner.succeed(chalk.green("Synced skills, packages and workspace dependencies successfully!"));
+      return;
+    }
+
+    spinner.info("Usage: oc sync OR oc sync skill OR oc sync package <name>");
   } catch (error: unknown) {
     spinner.fail("Failed to sync.");
     if (error instanceof Error) {
@@ -48,16 +63,53 @@ export async function sync(type?: string, name?: string) {
   }
 }
 
-async function syncPackage(templatePath: string, pkgName: string) {
+async function syncSkills(registry: Registry): Promise<void> {
+  const skills = registry.skills ?? [".claude", ".opencode", ".github"];
+  const templateRoot = getLocalTemplatePath("");
+  if (!templateRoot) {
+    return;
+  }
+
+  for (const skillDir of skills) {
+    const source = path.resolve(templateRoot, skillDir);
+    const target = path.resolve(process.cwd(), skillDir);
+    if (await fs.pathExists(source)) {
+      await fs.copy(source, target);
+    }
+  }
+}
+
+async function syncWorkspaceDeps(sourcePath: string): Promise<void> {
+  const rootPkgPath = path.resolve(process.cwd(), "package.json");
+  const sourcePkgPath = path.resolve(sourcePath, "package.json");
+
+  if (!((await fs.pathExists(sourcePkgPath)) && (await fs.pathExists(rootPkgPath)))) {
+    return;
+  }
+
+  const [rootPkg, sourcePkg] = await Promise.all([fs.readJson(rootPkgPath), fs.readJson(sourcePkgPath)]);
+
+  rootPkg.dependencies = {
+    ...(rootPkg.dependencies ?? {}),
+    ...(sourcePkg.dependencies ?? {}),
+  };
+  rootPkg.devDependencies = {
+    ...(rootPkg.devDependencies ?? {}),
+    ...(sourcePkg.devDependencies ?? {}),
+  };
+
+  await fs.writeJson(rootPkgPath, rootPkg, { spaces: 2 });
+}
+
+async function syncPackage(templatePath: string, pkgName: string): Promise<void> {
   const targetDir = path.resolve(process.cwd(), "packages", pkgName);
   const sourcePath = getLocalTemplatePath(templatePath);
 
   if (sourcePath) {
-    // Use copySync or fs.copy to overwrite
-    await fs.emptyDir(targetDir); // Clean before sync? Or just overwrite. emptying is safer for sync.
+    await fs.emptyDir(targetDir);
     await fs.copy(sourcePath, targetDir);
+    await syncWorkspaceDeps(sourcePath);
   } else {
-    // TODO: Remote download
     console.warn(chalk.yellow(`Could not find local template for ${pkgName}. Remote download not implemented.`));
   }
 }
