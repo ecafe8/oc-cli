@@ -21,7 +21,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@biomejs/biome": "^2.3.11",
+    "@biomejs/biome": "2.3.11",
     "chalk": "^5.3.0",
     "commander": "^11.0.0",
     "fs-extra": "^11.1.1",
@@ -30,10 +30,11 @@
     "prompts": "^2.4.2"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
     "@types/fs-extra": "^11.0.0",
+    "@types/node": "^20.0.0",
     "@types/prompts": "^2.4.0",
+    "bun-types": "latest",
     "typescript": "^5.0.0",
-    "bun-types": "latest"
+    "ultracite": "7.0.11"
   }
 }

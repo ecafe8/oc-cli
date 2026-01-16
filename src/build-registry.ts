@@ -31,8 +31,9 @@ async function getPackageInfo(dirPath: string) {
     if (await fs.pathExists(pkgPath)) {
       return await fs.readJson(pkgPath);
     }
-  } catch (error) {
-    console.warn(chalk.yellow(`Warning: Could not read package.json in ${dirPath}`));
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(chalk.yellow(`Warning: Could not read package.json in ${dirPath}: ${message}`));
   }
   return {};
 }
@@ -47,8 +48,12 @@ async function scanDirectory(baseDir: string, type: "app" | "package"): Promise<
   const entries = await fs.readdir(baseDir, { withFileTypes: true });
 
   for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    if (entry.name.startsWith(".")) continue;
+    if (!entry.isDirectory()) {
+      continue;
+    }
+    if (entry.name.startsWith(".")) {
+      continue;
+    }
 
     const fullPath = path.join(baseDir, entry.name);
     const relativePath = path.relative(process.cwd(), fullPath); // Use path relative to root
@@ -58,7 +63,7 @@ async function scanDirectory(baseDir: string, type: "app" | "package"): Promise<
       name: entry.name,
       path: relativePath,
       description: pkgInfo.description || "",
-      type: type,
+      type,
       dependencies: pkgInfo.dependencies ? Object.keys(pkgInfo.dependencies) : [],
       devDependencies: pkgInfo.devDependencies ? Object.keys(pkgInfo.devDependencies) : [],
     };
@@ -76,9 +81,13 @@ async function scanTemplateRoot(baseDir: string): Promise<TemplateRoot> {
 
   const entries = await fs.readdir(baseDir, { withFileTypes: true });
   for (const entry of entries) {
-    if (entry.name.startsWith(".")) continue; // Ignore hidden files like .DS_Store
+    if (entry.name.startsWith(".")) {
+      continue;
+    }
     // Ignore apps and packages directories calling them recursively not needed for root template
-    if (entry.isDirectory() && (entry.name === "apps" || entry.name === "packages")) continue;
+    if (entry.isDirectory() && (entry.name === "apps" || entry.name === "packages")) {
+      continue;
+    }
 
     // We only want files or other config directories in root
     files.push(entry.name);

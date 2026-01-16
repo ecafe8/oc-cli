@@ -6,7 +6,8 @@
 			"@repo/share-ui/*": ["../share-ui/src/*"],
 			"@repo/share-frontend/*": ["./src/*"]
 		},
-		"outDir": "dist"
+    "outDir": "dist",
+    "strictNullChecks": true
 	},
 	"include": ["src"],
 	"exclude": ["dist", "build", "node_modules"]

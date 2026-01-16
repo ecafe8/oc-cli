@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.11/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "root": true,
   "linter": {
     "enabled": true,
@@ -18,8 +18,8 @@
       "enabled": true
     }
   },
-  // 忽略 template 目录下的文件
   "files": {
-    "includes": ["**", "!template", "!test-playground", "!dist", "!node_modules"]
-  }
+    "includes": ["!template", "!test-playground", "!dist", "!node_modules"]
+  },
+  "extends": ["ultracite/biome/core"]
 }

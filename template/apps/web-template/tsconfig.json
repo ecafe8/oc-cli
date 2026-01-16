@@ -11,7 +11,8 @@
       "@repo/web-template/*": ["./*"],
       "@repo/share-ui/*": ["../../packages/share-ui/src/*"],
       "@repo/share-frontend/*": ["../../packages/share-frontend/src/*"]
-    }
+    },
+    "strictNullChecks": true
   },
   "include": ["**/*.ts", "**/*.tsx", "next-env.d.ts", "next.config.js", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

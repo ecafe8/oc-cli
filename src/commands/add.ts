@@ -53,8 +53,9 @@ export async function add(type: string, templateName: string, targetName: string
     }
 
     spinner.succeed(chalk.green(`${type} added successfully to apps/${targetName}!`));
-  } catch (error: any) {
+  } catch (error: unknown) {
     spinner.fail("Failed to add resource.");
-    console.error(error.message);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(message);
   }
 }

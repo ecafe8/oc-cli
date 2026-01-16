@@ -1,6 +1,6 @@
+import path from "node:path";
 import chalk from "chalk";
 import fs from "fs-extra";
-import path from "path";
 
 export const config = {
   registryUrl: "https://raw.githubusercontent.com/ecafe8/oc-cli/main",
@@ -34,7 +34,7 @@ export async function loadRegistry(): Promise<Registry | null> {
   if (await fs.pathExists(config.localRegistryPath)) {
     try {
       return await fs.readJson(config.localRegistryPath);
-    } catch (e) {
+    } catch (_e) {
       console.warn(chalk.yellow("Found local registry.json but failed to parse it."));
     }
   }
@@ -42,9 +42,11 @@ export async function loadRegistry(): Promise<Registry | null> {
   // 2. Fallback to remote registry
   try {
     const res = await fetch(`${config.registryUrl}/registry.json`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
     return (await res.json()) as Registry;
-  } catch (error) {
+  } catch (_error) {
     console.warn(chalk.yellow("Failed to load registry from remote."));
     return null;
   }

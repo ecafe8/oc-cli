@@ -5,7 +5,8 @@
 		"paths": {
 			"@repo/share-backend/*": ["./src/*"]
 		},
-		"outDir": "dist"
+    "outDir": "dist",
+    "strictNullChecks": true
 	},
 	"include": ["src"],
 	"exclude": ["dist", "build", "node_modules"]

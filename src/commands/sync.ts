@@ -5,7 +5,7 @@ import ora from "ora";
 import { getLocalTemplatePath, loadRegistry } from "../utils/config";
 
 export async function sync(type?: string, name?: string) {
-  const spinner = ora(`Syncing...`).start();
+  const spinner = ora("Syncing...").start();
 
   try {
     const registry = await loadRegistry();
@@ -20,7 +20,7 @@ export async function sync(type?: string, name?: string) {
       for (const [pkgName, pkgItem] of Object.entries(packages)) {
         await syncPackage(pkgItem.path, pkgName);
       }
-      spinner.succeed(chalk.green(`Synced all packages successfully!`));
+      spinner.succeed(chalk.green("Synced all packages successfully!"));
       return;
     }
 
@@ -40,9 +40,11 @@ export async function sync(type?: string, name?: string) {
     }
 
     spinner.info("Usage: oc sync OR oc sync package <name>");
-  } catch (error: any) {
+  } catch (error: unknown) {
     spinner.fail("Failed to sync.");
-    console.error(error.message);
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
   }
 }
 
