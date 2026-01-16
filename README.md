@@ -88,5 +88,5 @@ oc sync packages
 [oc-template](https://github.com/ecafe8/oc-template)
 
 ```bash
-git submodule add https://github.com/ecafe8/oc-template template
+git submodule add git@github.com:ecafe8/oc-template.git template
 ```
