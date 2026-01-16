@@ -8,6 +8,8 @@ node_modules
 # testing
 coverage
 
+test-playground/*
+
 # next.js
 .next/
 out/

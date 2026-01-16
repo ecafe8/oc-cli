@@ -1,7 +1,7 @@
 {
-  "name": "oc-cli",
+  "name": "@octopus-ai/oc-cli",
   "version": "1.0.0",
-  "description": "A CLI tool for managing OC project templates and resources",
+  "description": "A CLI tool for managing octopus-ai project templates and resources",
   "main": "dist/index.js",
   "bin": {
     "oc": "./bin/oc.js"

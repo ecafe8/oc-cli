@@ -12,7 +12,7 @@ program
 program
   .command("init")
   .description("Initialize a new monorepo project")
-  .argument("<project-name>", "Name of the project")
+  .argument("[project-name]", "Name of the project")
   .action(init);
 
 program
