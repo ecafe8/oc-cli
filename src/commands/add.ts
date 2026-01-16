@@ -1,8 +1,8 @@
 import chalk from "chalk";
+import fs from "fs-extra";
 import ora from "ora";
 import path from "path";
-import fs from "fs-extra";
-import { loadRegistry, getLocalTemplatePath } from "../utils/config";
+import { getLocalTemplatePath, loadRegistry, type RegistryItem } from "../utils/config";
 
 export async function add(type: string, templateName: string, targetName: string) {
   const spinner = ora(`Adding ${type} ${templateName} as ${targetName}...`).start();
@@ -14,7 +14,7 @@ export async function add(type: string, templateName: string, targetName: string
       return;
     }
 
-    let templateItem;
+    let templateItem: RegistryItem | undefined;
     if (type === "app") {
       templateItem = registry.apps[templateName];
     } else {
