@@ -1,6 +1,7 @@
 import path from "node:path";
 import chalk from "chalk";
 import fs from "fs-extra";
+import { skillsDir } from "./utils/config";
 
 const TEMPLATE_DIR = path.resolve(process.cwd(), "template");
 const REGISTRY_PATH = path.resolve(process.cwd(), "registry.json");
@@ -51,7 +52,8 @@ async function scanDirectory(baseDir: string, type: "app" | "package"): Promise<
     if (!entry.isDirectory()) {
       continue;
     }
-    if (entry.name.startsWith(".")) {
+    // 除了 skillsDir 之外跳过隐藏目录
+    if (entry.name.startsWith(".") && !skillsDir.includes(entry.name)) {
       continue;
     }
 
@@ -81,11 +83,12 @@ async function scanTemplateRoot(baseDir: string): Promise<TemplateRoot> {
 
   const entries = await fs.readdir(baseDir, { withFileTypes: true });
   for (const entry of entries) {
-    if (entry.name.startsWith(".")) {
+    // 除了 skillsDir 之外跳过隐藏目录
+    if (entry.name.startsWith(".") && !skillsDir.includes(entry.name)) {
       continue;
     }
-    // Ignore apps and packages directories calling them recursively not needed for root template
     if (entry.isDirectory() && (entry.name === "apps" || entry.name === "packages")) {
+      // Ignore apps and packages directories calling them recursively not needed for root template
       continue;
     }
 

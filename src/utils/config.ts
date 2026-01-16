@@ -8,6 +8,8 @@ export const config = {
   localRegistryPath: path.resolve(__dirname, "../../registry.json"),
 };
 
+export const skillsDir = [".claude", ".opencode", ".github"];
+
 export interface RegistryItem {
   id: string; // Add id to interface although registry.json uses key as id mostly
   name: string;

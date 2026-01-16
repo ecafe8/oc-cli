@@ -2,7 +2,7 @@ import path from "node:path";
 import chalk from "chalk";
 import fs from "fs-extra";
 import ora from "ora";
-import { getLocalTemplatePath, loadRegistry } from "../utils/config";
+import { getLocalTemplatePath, loadRegistry, skillsDir } from "../utils/config";
 
 interface PackageItem {
   path: string;
@@ -64,7 +64,7 @@ export async function sync(type?: string, name?: string): Promise<void> {
 }
 
 async function syncSkills(registry: Registry): Promise<void> {
-  const skills = registry.skills ?? [".claude", ".opencode", ".github"];
+  const skills = registry.skills ?? skillsDir;
   const templateRoot = getLocalTemplatePath("");
   if (!templateRoot) {
     return;

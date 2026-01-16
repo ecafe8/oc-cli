@@ -2,8 +2,11 @@
   "template": {
     "path": "template",
     "files": [
+      ".claude",
+      ".github",
+      ".opencode",
       "README.md",
-      "biome.json",
+      "biome.jsonc",
       "bun.lock",
       "package.json",
       "tsconfig.json",
@@ -56,7 +59,11 @@
       "path": "template/packages/share-backend",
       "description": "",
       "type": "package",
-      "dependencies": ["radash", "uuid", "zod"],
+      "dependencies": [
+        "radash",
+        "uuid",
+        "zod"
+      ],
       "devDependencies": [
         "@types/node",
         "@repo/biome-config",
@@ -69,7 +76,12 @@
       "path": "template/packages/share-frontend",
       "description": "",
       "type": "package",
-      "dependencies": ["chroma-js", "clsx", "tailwind-merge", "@repo/share-ui"],
+      "dependencies": [
+        "chroma-js",
+        "clsx",
+        "tailwind-merge",
+        "@repo/share-ui"
+      ],
       "devDependencies": [
         "@repo/biome-config",
         "@repo/typescript-config",
