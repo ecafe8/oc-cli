@@ -52,8 +52,7 @@ async function scanDirectory(baseDir: string, type: "app" | "package"): Promise<
     if (!entry.isDirectory()) {
       continue;
     }
-    // 除了 skillsDir 之外跳过隐藏目录
-    if (entry.name.startsWith(".") && !skillsDir.includes(entry.name)) {
+    if (entry.name.startsWith(".")) {
       continue;
     }
 

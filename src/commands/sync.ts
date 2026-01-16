@@ -2,16 +2,7 @@ import path from "node:path";
 import chalk from "chalk";
 import fs from "fs-extra";
 import ora from "ora";
-import { getLocalTemplatePath, loadRegistry, skillsDir } from "../utils/config";
-
-interface PackageItem {
-  path: string;
-}
-
-interface Registry {
-  packages: Record<string, PackageItem>;
-  skills?: string[];
-}
+import { getLocalTemplatePath, loadRegistry, type Registry, skillsDir } from "../utils/config";
 
 export async function sync(type?: string, name?: string): Promise<void> {
   const spinner = ora("Syncing...").start();
@@ -64,16 +55,14 @@ export async function sync(type?: string, name?: string): Promise<void> {
 }
 
 async function syncSkills(registry: Registry): Promise<void> {
-  const skills = registry.skills ?? skillsDir;
-  const templateRoot = getLocalTemplatePath("");
-  if (!templateRoot) {
-    return;
-  }
+  const skills = skillsDir;
+  const templatePath = registry.template.path;
 
   for (const skillDir of skills) {
-    const source = path.resolve(templateRoot, skillDir);
+    const source = getLocalTemplatePath(path.join(templatePath, skillDir));
     const target = path.resolve(process.cwd(), skillDir);
-    if (await fs.pathExists(source)) {
+
+    if (source && (await fs.pathExists(source))) {
       await fs.copy(source, target);
     }
   }
