@@ -14,7 +14,7 @@ export async function sync(type?: string, name?: string) {
              return;
         }
 
-        if (type === 'packages') {
+        if (!type) {
              // Sync all packages
              const packages = registry.packages;
              for (const [pkgName, pkgItem] of Object.entries(packages)) {
@@ -39,7 +39,7 @@ export async function sync(type?: string, name?: string) {
             return;
         }
 
-        spinner.info("Usage: oc sync packages OR oc sync package <name>");
+        spinner.info("Usage: oc sync OR oc sync package <name>");
 
     } catch (error: any) {
         spinner.fail("Failed to sync.");
