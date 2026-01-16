@@ -1,3 +1,3 @@
 export const config = {
-  registry: "https://raw.githubusercontent.com/ecafe8/oc-cli/master", // Placeholder
+  registry: "https://raw.githubusercontent.com/ecafe8/oc-cli/main", // Placeholder
 };
