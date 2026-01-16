@@ -15,9 +15,9 @@ program
 program
   .command("add")
   .description("Add a resource/app to the project")
-  .argument("<type>", "Type of resource (e.g., app)")
-  .argument("<template-name>", "Name of the template (e.g., web-template)")
-  .argument("<target-name>", "Name of the target folder")
+  .argument("[type]", "Type of resource (e.g., app)")
+  .argument("[template-name]", "Name of the template (e.g., web-template)")
+  .argument("[target-name]", "Name of the target folder")
   .action(add);
 
 program
