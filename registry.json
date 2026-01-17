@@ -5,6 +5,7 @@
       ".claude",
       ".github",
       ".opencode",
+      ".vscode",
       "README.md",
       "biome.jsonc",
       "bun.lock",
