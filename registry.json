@@ -7,7 +7,6 @@
       ".opencode",
       ".vscode",
       "README.md",
-      "biome.jsonc",
       "bun.lock",
       "package.json",
       "tsconfig.json",
@@ -94,6 +93,7 @@
       "type": "package",
       "dependencies": [
         "@base-ui-components/react",
+        "@countrystatecity/countries",
         "@radix-ui/react-dialog",
         "@radix-ui/react-hover-card",
         "@radix-ui/react-slot",
@@ -103,6 +103,7 @@
         "class-variance-authority",
         "clsx",
         "cmdk",
+        "country-flag-icons",
         "embla-carousel-react",
         "input-otp",
         "lucide",
@@ -112,7 +113,8 @@
         "radix-ui",
         "react-icons",
         "tailwind-merge",
-        "tw-animate-css"
+        "tw-animate-css",
+        "vaul"
       ],
       "devDependencies": [
         "@repo/biome-config",
