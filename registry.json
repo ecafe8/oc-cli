@@ -67,25 +67,6 @@
         "typescript"
       ]
     },
-    "share-frontend": {
-      "name": "share-frontend",
-      "path": "template/packages/share-frontend",
-      "description": "",
-      "type": "package",
-      "dependencies": [
-        "chroma-js",
-        "clsx",
-        "tailwind-merge",
-        "@repo/share-ui"
-      ],
-      "devDependencies": [
-        "@repo/biome-config",
-        "@repo/typescript-config",
-        "@types/chroma-js",
-        "@types/node",
-        "typescript"
-      ]
-    },
     "share-ui": {
       "name": "share-ui",
       "path": "template/packages/share-ui",
