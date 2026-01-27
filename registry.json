@@ -7,6 +7,7 @@
       ".opencode",
       ".vscode",
       "README.md",
+      "biome.json",
       "bun.lock",
       "package.json",
       "tsconfig.json",
@@ -20,7 +21,7 @@
       "description": "",
       "type": "app",
       "dependencies": [
-        "@repo/share-frontend",
+        "@countrystatecity/countries",
         "@repo/share-ui",
         "next"
       ],
@@ -80,7 +81,12 @@
         "@radix-ui/react-slot",
         "@radix-ui/react-tooltip",
         "@rive-app/react-webgl2",
+        "@streamdown/cjk",
+        "@streamdown/code",
+        "@streamdown/math",
+        "@streamdown/mermaid",
         "@tanstack/react-table",
+        "ansi-to-react",
         "class-variance-authority",
         "clsx",
         "cmdk",
@@ -93,6 +99,7 @@
         "motion",
         "radix-ui",
         "react-icons",
+        "streamdown",
         "tailwind-merge",
         "tw-animate-css",
         "vaul"

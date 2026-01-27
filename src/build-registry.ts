@@ -80,14 +80,17 @@ async function scanTemplateRoot(baseDir: string): Promise<TemplateRoot> {
     return { path: "template", files: [] };
   }
 
+  // Directories to ignore in template root
+  const ignoredDirs = ["apps", "packages", "resource", "scripts"];
+
   const entries = await fs.readdir(baseDir, { withFileTypes: true });
   for (const entry of entries) {
     // 除了 skillsDir 之外跳过隐藏目录
     if (entry.name.startsWith(".") && !skillsDir.includes(entry.name)) {
       continue;
     }
-    if (entry.isDirectory() && (entry.name === "apps" || entry.name === "packages")) {
-      // Ignore apps and packages directories calling them recursively not needed for root template
+    if (entry.isDirectory() && ignoredDirs.includes(entry.name)) {
+      // Ignore specified directories
       continue;
     }
 
