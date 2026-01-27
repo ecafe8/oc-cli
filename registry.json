@@ -76,6 +76,7 @@
       "dependencies": [
         "@base-ui-components/react",
         "@countrystatecity/countries",
+        "@headless-tree/core",
         "@radix-ui/react-dialog",
         "@radix-ui/react-hover-card",
         "@radix-ui/react-slot",
