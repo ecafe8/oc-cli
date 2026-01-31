@@ -2,6 +2,7 @@ import path from "node:path";
 import chalk from "chalk";
 import fs from "fs-extra";
 import ora from "ora";
+import prompts from "prompts";
 import { getLocalTemplatePath, loadRegistry, type Registry, skillsDir } from "../utils/config";
 
 export async function sync(type?: string, name?: string): Promise<void> {
@@ -63,7 +64,7 @@ async function syncSkills(registry: Registry): Promise<void> {
     const target = path.resolve(process.cwd(), skillDir);
 
     if (source && (await fs.pathExists(source))) {
-      await fs.copy(source, target);
+      await copyWithConfirmation(source, target, skillDir);
     }
   }
 }
@@ -90,13 +91,47 @@ async function syncWorkspaceDeps(sourcePath: string): Promise<void> {
   await fs.writeJson(rootPkgPath, rootPkg, { spaces: 2 });
 }
 
+async function copyWithConfirmation(source: string, target: string, displayPath: string): Promise<void> {
+  const stats = await fs.stat(source);
+
+  if (stats.isDirectory()) {
+    await fs.ensureDir(target);
+    const items = await fs.readdir(source);
+
+    for (const item of items) {
+      const srcPath = path.join(source, item);
+      const destPath = path.join(target, item);
+      const relPath = path.join(displayPath, item);
+      await copyWithConfirmation(srcPath, destPath, relPath);
+    }
+  } else {
+    const targetExists = await fs.pathExists(target);
+
+    if (targetExists) {
+      const response = await prompts({
+        type: "confirm",
+        name: "overwrite",
+        message: `File '${displayPath}' already exists. Do you want to overwrite it?`,
+        initial: false,
+      });
+
+      if (!response.overwrite) {
+        console.log(chalk.yellow(`Skipped ${displayPath}`));
+        return;
+      }
+    }
+
+    await fs.copy(source, target, { overwrite: true });
+  }
+}
+
 async function syncPackage(templatePath: string, pkgName: string): Promise<void> {
   const targetDir = path.resolve(process.cwd(), "packages", pkgName);
   const sourcePath = getLocalTemplatePath(templatePath);
 
   if (sourcePath) {
-    await fs.emptyDir(targetDir);
-    await fs.copy(sourcePath, targetDir);
+    await fs.ensureDir(targetDir);
+    await copyWithConfirmation(sourcePath, targetDir, `packages/${pkgName}`);
     await syncWorkspaceDeps(sourcePath);
   } else {
     console.warn(chalk.yellow(`Could not find local template for ${pkgName}. Remote download not implemented.`));
