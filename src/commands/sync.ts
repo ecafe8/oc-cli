@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import path from "node:path";
 import chalk from "chalk";
 import fs from "fs-extra";
@@ -98,6 +99,22 @@ async function syncWorkspaceDeps(sourcePath: string): Promise<void> {
   await fs.writeJson(rootPkgPath, rootPkg, { spaces: 2 });
 }
 
+async function calculateFileHash(filePath: string): Promise<string> {
+  const fileBuffer = await fs.readFile(filePath);
+  const hashSum = crypto.createHash("sha256");
+  hashSum.update(fileBuffer);
+  return hashSum.digest("hex");
+}
+
+async function areFilesIdentical(sourcePath: string, targetPath: string): Promise<boolean> {
+  try {
+    const [sourceHash, targetHash] = await Promise.all([calculateFileHash(sourcePath), calculateFileHash(targetPath)]);
+    return sourceHash === targetHash;
+  } catch {
+    return false;
+  }
+}
+
 async function promptForOverwrite(displayPath: string): Promise<boolean> {
   if (overwriteStrategy === "abort") {
     return false;
@@ -172,6 +189,15 @@ async function copyWithConfirmation(source: string, target: string, displayPath:
     const targetExists = await fs.pathExists(target);
 
     if (targetExists) {
+      // Check if files are identical by comparing hash
+      const identical = await areFilesIdentical(source, target);
+
+      if (identical) {
+        // Files are identical, skip silently
+        return;
+      }
+
+      // Files are different, ask user
       const shouldOverwrite = await promptForOverwrite(displayPath);
       if (!shouldOverwrite) {
         return;
