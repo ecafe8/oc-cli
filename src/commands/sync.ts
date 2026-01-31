@@ -5,10 +5,17 @@ import ora from "ora";
 import prompts from "prompts";
 import { getLocalTemplatePath, loadRegistry, type Registry, skillsDir } from "../utils/config";
 
+type OverwriteStrategy = "ask" | "overwrite-all" | "skip-all" | "abort";
+
+let overwriteStrategy: OverwriteStrategy = "ask";
+
 export async function sync(type?: string, name?: string): Promise<void> {
   const spinner = ora("Syncing...").start();
 
   try {
+    // Reset strategy for each sync operation
+    overwriteStrategy = "ask";
+
     const registry = (await loadRegistry()) as Registry | undefined;
     if (!registry) {
       spinner.fail("Could not load registry.");
@@ -91,7 +98,64 @@ async function syncWorkspaceDeps(sourcePath: string): Promise<void> {
   await fs.writeJson(rootPkgPath, rootPkg, { spaces: 2 });
 }
 
+async function promptForOverwrite(displayPath: string): Promise<boolean> {
+  if (overwriteStrategy === "abort") {
+    return false;
+  }
+
+  if (overwriteStrategy === "skip-all") {
+    console.log(chalk.yellow(`Skipped ${displayPath}`));
+    return false;
+  }
+
+  if (overwriteStrategy === "overwrite-all") {
+    return true;
+  }
+
+  const response = await prompts({
+    type: "select",
+    name: "action",
+    message: `File '${displayPath}' already exists.`,
+    choices: [
+      { title: "Overwrite this file", value: "overwrite" },
+      { title: "Skip this file", value: "skip" },
+      { title: "Overwrite all remaining files", value: "overwrite-all" },
+      { title: "Skip all remaining files", value: "skip-all" },
+      { title: "Abort operation", value: "abort" },
+    ],
+    initial: 1,
+  });
+
+  if (!response.action || response.action === "abort") {
+    overwriteStrategy = "abort";
+    console.log(chalk.red("Operation aborted"));
+    return false;
+  }
+
+  if (response.action === "skip") {
+    console.log(chalk.yellow(`Skipped ${displayPath}`));
+    return false;
+  }
+
+  if (response.action === "overwrite-all") {
+    overwriteStrategy = "overwrite-all";
+    return true;
+  }
+
+  if (response.action === "skip-all") {
+    overwriteStrategy = "skip-all";
+    console.log(chalk.yellow(`Skipped ${displayPath}`));
+    return false;
+  }
+
+  return true;
+}
+
 async function copyWithConfirmation(source: string, target: string, displayPath: string): Promise<void> {
+  if (overwriteStrategy === "abort") {
+    return;
+  }
+
   const stats = await fs.stat(source);
 
   if (stats.isDirectory()) {
@@ -108,15 +172,8 @@ async function copyWithConfirmation(source: string, target: string, displayPath:
     const targetExists = await fs.pathExists(target);
 
     if (targetExists) {
-      const response = await prompts({
-        type: "confirm",
-        name: "overwrite",
-        message: `File '${displayPath}' already exists. Do you want to overwrite it?`,
-        initial: false,
-      });
-
-      if (!response.overwrite) {
-        console.log(chalk.yellow(`Skipped ${displayPath}`));
+      const shouldOverwrite = await promptForOverwrite(displayPath);
+      if (!shouldOverwrite) {
         return;
       }
     }
