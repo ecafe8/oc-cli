@@ -32,6 +32,33 @@
         "@types/node",
         "typescript"
       ]
+    },
+    "server-template": {
+      "name": "server-template",
+      "path": "template/apps/server-template",
+      "description": "",
+      "type": "app",
+      "dependencies": [
+        "@hono/node-server",
+        "@hono/standard-validator",
+        "@hono/swagger-ui",
+        "drizzle-orm",
+        "hono",
+        "hono-openapi",
+        "pg",
+        "pino",
+        "zod"
+      ],
+      "devDependencies": [
+        "@repo/share-backend",
+        "@repo/typescript-config",
+        "@types/node",
+        "@types/pg",
+        "drizzle-kit",
+        "pino-pretty",
+        "tsx",
+        "typescript"
+      ]
     }
   },
   "packages": {
@@ -42,6 +69,17 @@
       "type": "package",
       "dependencies": [],
       "devDependencies": []
+    },
+    "share-ext": {
+      "name": "share-ext",
+      "path": "template/packages/share-ext",
+      "description": "",
+      "type": "package",
+      "dependencies": [],
+      "devDependencies": [
+        "@types/bun",
+        "@types/chrome"
+      ]
     },
     "typescript-config": {
       "name": "typescript-config",
@@ -76,6 +114,7 @@
       "dependencies": [
         "@base-ui-components/react",
         "@countrystatecity/countries",
+        "@floating-ui/react",
         "@headless-tree/core",
         "@radix-ui/react-dialog",
         "@radix-ui/react-hover-card",
