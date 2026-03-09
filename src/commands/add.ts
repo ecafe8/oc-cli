@@ -7,7 +7,122 @@ import { getLocalTemplatePath, loadRegistry } from "../utils/config";
 
 const KEBAB_CASE_REGEX: RegExp = /^[a-z0-9-]+$/;
 
-export async function add(inputType?: string, inputTemplateName?: string, inputTargetName?: string) {
+const TEXT_EXTENSIONS: ReadonlySet<string> = new Set([
+  ".ts",
+  ".tsx",
+  ".js",
+  ".jsx",
+  ".mjs",
+  ".cjs",
+  ".mts",
+  ".cts",
+  ".json",
+  ".jsonc",
+  ".md",
+  ".txt",
+  ".toml",
+  ".yaml",
+  ".yml",
+]);
+
+async function replaceInAllFiles(dir: string, oldStr: string, newStr: string): Promise<void> {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === "node_modules") {
+        continue;
+      }
+      await replaceInAllFiles(fullPath, oldStr, newStr);
+    } else if (entry.isFile()) {
+      const ext = path.extname(entry.name).toLowerCase();
+      const isEnvFile = entry.name.startsWith(".env");
+      if (!(TEXT_EXTENSIONS.has(ext) || isEnvFile)) {
+        continue;
+      }
+      try {
+        const content = await fs.readFile(fullPath, "utf-8");
+        if (content.includes(oldStr)) {
+          await fs.writeFile(fullPath, content.split(oldStr).join(newStr), "utf-8");
+        }
+      } catch {
+        // Skip unreadable files silently
+      }
+    }
+  }
+}
+
+async function promptType(input?: string): Promise<string | undefined> {
+  if (input) {
+    return input;
+  }
+  const response = await prompts({
+    type: "select",
+    name: "value",
+    message: "Select resource type:",
+    choices: [{ title: "app", value: "app" }],
+  });
+  return response.value as string | undefined;
+}
+
+async function promptTemplateName(available: string[], input?: string): Promise<string | undefined> {
+  if (input) {
+    return input;
+  }
+  const response = await prompts({
+    type: "select",
+    name: "value",
+    message: "Select a template:",
+    choices: available.map((t) => ({ title: t, value: t })),
+  });
+  return response.value as string | undefined;
+}
+
+async function promptTargetName(input?: string): Promise<string | undefined> {
+  if (input) {
+    return input;
+  }
+  const response = await prompts({
+    type: "text",
+    name: "value",
+    message: "Enter target name:",
+    validate: (v: string) => {
+      if (!v.trim()) {
+        return "Target name is required";
+      }
+      if (!KEBAB_CASE_REGEX.test(v)) {
+        return "Target name must be kebab-case (a-z, 0-9, -)";
+      }
+      return true;
+    },
+  });
+  return response.value as string | undefined;
+}
+
+async function promptNewPkgName(defaultName: string): Promise<string> {
+  const response = await prompts({
+    type: "text",
+    name: "value",
+    message: `Enter import path alias (for imports & tsconfig.json, default: "${defaultName}"):`,
+    initial: defaultName,
+  });
+  return (response.value as string | undefined)?.trim() || defaultName;
+}
+
+async function resolveOldPkgName(sourcePath: string | null, templateName: string): Promise<string> {
+  if (sourcePath) {
+    const templatePkgPath = path.join(sourcePath, "package.json");
+    if (await fs.pathExists(templatePkgPath)) {
+      const templatePkg = await fs.readJson(templatePkgPath);
+      if (templatePkg.name) {
+        return templatePkg.name as string;
+      }
+    }
+  }
+  return `@repo/${templateName}`;
+}
+
+export async function add(inputType?: string, inputTemplateName?: string, inputTargetName?: string): Promise<void> {
   try {
     const registry = await loadRegistry();
     if (!registry) {
@@ -16,20 +131,10 @@ export async function add(inputType?: string, inputTemplateName?: string, inputT
     }
 
     // 1. Resolve Type
-    let type = inputType;
-    if (!type) {
-      const response = await prompts({
-        type: "select",
-        name: "value",
-        message: "Select resource type:",
-        choices: [{ title: "app", value: "app" }],
-      });
-      type = response.value;
-    }
-
+    const type = await promptType(inputType);
     if (!type) {
       return;
-    } // User cancelled
+    }
 
     if (type !== "app") {
       console.error(chalk.red(`Unknown type: ${type}. Supported types: app`));
@@ -37,27 +142,15 @@ export async function add(inputType?: string, inputTemplateName?: string, inputT
     }
 
     // 2. Resolve Template Name
-    let templateName = inputTemplateName;
     const availableTemplates = Object.keys(registry.apps);
-
-    if (!templateName) {
-      if (availableTemplates.length === 0) {
-        console.error(chalk.red("No templates available in registry."));
-        return;
-      }
-
-      const response = await prompts({
-        type: "select",
-        name: "value",
-        message: "Select a template:",
-        choices: availableTemplates.map((t) => ({ title: t, value: t })),
-      });
-      templateName = response.value;
+    if (availableTemplates.length === 0) {
+      console.error(chalk.red("No templates available in registry."));
+      return;
     }
-
+    const templateName = await promptTemplateName(availableTemplates, inputTemplateName);
     if (!templateName) {
       return;
-    } // User cancelled
+    }
 
     const templateItem = registry.apps[templateName];
     if (!templateItem) {
@@ -66,30 +159,18 @@ export async function add(inputType?: string, inputTemplateName?: string, inputT
     }
 
     // 3. Resolve Target Name
-    let targetName = inputTargetName;
-    if (!targetName) {
-      const response = await prompts({
-        type: "text",
-        name: "value",
-        message: "Enter target name:",
-        validate: (input: string) => {
-          if (!input.trim()) {
-            return "Target name is required";
-          }
-          if (!KEBAB_CASE_REGEX.test(input)) {
-            return "Target name must be kebab-case (a-z, 0-9, -)";
-          }
-          return true;
-        },
-      });
-      targetName = response.value;
-    }
-
+    const targetName = await promptTargetName(inputTargetName);
     if (!targetName) {
       console.error(chalk.red("Target name is required."));
       return;
     }
 
+    // 4. Resolve package name for import path replacement
+    const sourcePath = getLocalTemplatePath(templateItem.path);
+    const oldPkgName = await resolveOldPkgName(sourcePath, templateName);
+    const newPkgName = await promptNewPkgName(`@repo/${targetName}`);
+
+    // 5. Copy and update files
     const spinner = ora(`Adding ${type} ${templateName} as ${targetName}...`).start();
 
     const targetDir = path.resolve(process.cwd(), "apps", targetName);
@@ -97,8 +178,6 @@ export async function add(inputType?: string, inputTemplateName?: string, inputT
       spinner.fail(`Target directory apps/${targetName} already exists.`);
       return;
     }
-
-    const sourcePath = getLocalTemplatePath(templateItem.path);
 
     if (sourcePath) {
       await fs.copy(sourcePath, targetDir);
@@ -108,13 +187,8 @@ export async function add(inputType?: string, inputTemplateName?: string, inputT
       return;
     }
 
-    // Update package.json name in target
-    const pkgPath = path.join(targetDir, "package.json");
-    if (await fs.pathExists(pkgPath)) {
-      const pkg = await fs.readJson(pkgPath);
-      pkg.name = targetName;
-      await fs.writeJson(pkgPath, pkg, { spaces: 2 });
-    }
+    // Replace package name in all text files (package.json, tsconfig.json, *.ts imports, etc.)
+    await replaceInAllFiles(targetDir, oldPkgName, newPkgName);
 
     spinner.succeed(chalk.green(`${type} added successfully to apps/${targetName}!`));
   } catch (error: unknown) {
