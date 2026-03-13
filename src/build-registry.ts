@@ -1,7 +1,7 @@
 import path from "node:path";
 import chalk from "chalk";
 import fs from "fs-extra";
-import { skillsDir } from "./utils/config";
+import { keepHiddenDirs } from "./utils/config";
 
 const TEMPLATE_DIR = path.resolve(process.cwd(), "template");
 const REGISTRY_PATH = path.resolve(process.cwd(), "registry.json");
@@ -86,7 +86,7 @@ async function scanTemplateRoot(baseDir: string): Promise<TemplateRoot> {
   const entries = await fs.readdir(baseDir, { withFileTypes: true });
   for (const entry of entries) {
     // 除了 skillsDir 之外跳过隐藏目录
-    if (entry.name.startsWith(".") && !skillsDir.includes(entry.name)) {
+    if (entry.name.startsWith(".") && !keepHiddenDirs.includes(entry.name)) {
       continue;
     }
     if (entry.isDirectory() && ignoredDirs.includes(entry.name)) {

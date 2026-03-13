@@ -10,6 +10,9 @@ export const config = {
 
 export const skillsDir = [".claude", ".opencode", ".github", ".vscode"];
 
+  // 需要保留的.开头的文件, 例如 .npmrc, .editorconfig等配置文件，以及技能目录
+export const keepHiddenDirs = skillsDir.concat([".npmrc", ".editorconfig", ".gitignore", ".gitmodules"]);
+
 export interface RegistryItem {
   id: string; // Add id to interface although registry.json uses key as id mostly
   name: string;
