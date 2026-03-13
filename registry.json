@@ -3,7 +3,11 @@
     "path": "template",
     "files": [
       ".claude",
+      ".editorconfig",
       ".github",
+      ".gitignore",
+      ".gitmodules",
+      ".npmrc",
       ".opencode",
       ".vscode",
       "README.md",
@@ -22,7 +26,9 @@
       "type": "app",
       "dependencies": [
         "@countrystatecity/countries",
+        "@repo/server-template",
         "@repo/share-ui",
+        "@tanstack/react-query",
         "next"
       ],
       "devDependencies": [
@@ -43,7 +49,6 @@
         "@hono/standard-validator",
         "@hono/swagger-ui",
         "drizzle-orm",
-        "hono",
         "hono-openapi",
         "pg",
         "pino",
