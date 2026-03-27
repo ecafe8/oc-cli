@@ -100,13 +100,19 @@
       "description": "",
       "type": "package",
       "dependencies": [
+        "@joplin/turndown-plugin-gfm",
+        "mammoth",
+        "pdf-parse",
         "radash",
+        "turndown",
         "uuid",
+        "xlsx",
         "zod"
       ],
       "devDependencies": [
         "@types/node",
         "@repo/biome-config",
+        "@types/turndown",
         "@repo/typescript-config",
         "typescript"
       ]
