@@ -5,6 +5,55 @@ import ora, { type Ora } from "ora";
 import prompts from "prompts";
 import { getLocalTemplatePath, loadRegistry, type Registry } from "../utils/config";
 
+const TEXT_EXTENSIONS: ReadonlySet<string> = new Set([
+  ".ts",
+  ".tsx",
+  ".js",
+  ".jsx",
+  ".mjs",
+  ".cjs",
+  ".mts",
+  ".cts",
+  ".json",
+  ".jsonc",
+  ".md",
+  ".txt",
+  ".toml",
+  ".yaml",
+  ".yml",
+]);
+
+interface AppInitConfig {
+  targetName: string;
+  templateName: string;
+  replacements?: [string, string][];
+}
+
+const DEFAULT_APPS: AppInitConfig[] = [
+  {
+    targetName: "server-auth",
+    templateName: "server-auth",
+  },
+  {
+    targetName: "server-api",
+    templateName: "server-template",
+    replacements: [
+      ["@repo/server-template", "@repo/server-api"],
+      ["server-template", "server-api"],
+    ],
+  },
+  {
+    targetName: "web-app",
+    templateName: "web-template",
+    replacements: [
+      ["@repo/server-template", "@repo/server-api"],
+      ["@repo/web-template", "@repo/web-app"],
+      ["server-template", "server-api"],
+      ["web-template", "web-app"],
+    ],
+  },
+];
+
 export async function init(projectName?: string) {
   const finalProjectName = await getProjectName(projectName);
   if (!finalProjectName) {
@@ -28,15 +77,13 @@ export async function init(projectName?: string) {
 
     await copyBaseTemplates(targetDir, registry, spinner);
     await copyPackages(targetDir, registry, spinner);
-
-    const appsDir = path.join(targetDir, "apps");
-    await fs.ensureDir(appsDir);
+    await initializeDefaultApps(targetDir, registry, spinner);
 
     spinner.succeed(chalk.green(`Project ${finalProjectName} initialized successfully!`));
 
-    await promptAndInitializeApp(appsDir, registry);
-
-    console.log(chalk.blue(`\ncd ${finalProjectName}\nbun install\n`));
+    console.log(
+      chalk.blue(`\nCreated apps:\n- server-auth\n- server-api\n- web-app\n\ncd ${finalProjectName}\nbun install\n`)
+    );
   } catch (error: unknown) {
     spinner.fail("Failed to initialize project.");
     if (error instanceof Error) {
@@ -99,54 +146,64 @@ async function copyPackages(targetDir: string, registry: Registry, spinner: Ora)
   }
 }
 
-async function promptAndInitializeApp(appsDir: string, registry: Registry) {
-  const response = await prompts({
-    type: "confirm",
-    name: "initApp",
-    message: "Would you like to initialize an app?",
-    initial: true,
-  });
+async function initializeDefaultApps(targetDir: string, registry: Registry, spinner: Ora) {
+  const appsDir = path.join(targetDir, "apps");
+  await fs.ensureDir(appsDir);
 
-  if (!response.initApp) {
-    return;
-  }
-
-  const appInfo = await prompts({
-    type: "text",
-    name: "appName",
-    message: "Enter the application name:",
-    initial: "web",
-  });
-
-  if (appInfo.appName) {
-    await createApp(appsDir, appInfo.appName, registry);
+  for (const appConfig of DEFAULT_APPS) {
+    await createAppFromTemplate(appsDir, appConfig, registry, spinner);
   }
 }
 
-async function createApp(appsDir: string, appName: string, registry: Registry) {
-  const appSpinner = ora(`Initializing app ${appName}...`).start();
-  const webTemplate = registry.apps["web-template"];
-
-  if (!webTemplate) {
-    appSpinner.fail("web-template not found in registry.");
-    return;
+async function createAppFromTemplate(appsDir: string, appConfig: AppInitConfig, registry: Registry, spinner: Ora) {
+  const appTemplate = registry.apps[appConfig.templateName];
+  if (!appTemplate) {
+    throw new Error(`Template "${appConfig.templateName}" not found in registry.`);
   }
 
-  const appTargetDir = path.join(appsDir, appName);
-  const sourcePath = getLocalTemplatePath(webTemplate.path);
+  const sourcePath = getLocalTemplatePath(appTemplate.path);
+  if (!sourcePath) {
+    throw new Error(`Could not find local template path: ${appTemplate.path}.`);
+  }
 
-  if (sourcePath) {
-    await fs.copy(sourcePath, appTargetDir);
+  const appTargetDir = path.join(appsDir, appConfig.targetName);
+  await fs.copy(sourcePath, appTargetDir);
 
-    // Update package.json name
-    const pkgPath = path.join(appTargetDir, "package.json");
-    if (await fs.pathExists(pkgPath)) {
-      const pkg = await fs.readJson(pkgPath);
-      pkg.name = appName;
-      await fs.writeJson(pkgPath, pkg, { spaces: 2 });
+  for (const [oldValue, newValue] of appConfig.replacements ?? []) {
+    await replaceInAllFiles(appTargetDir, oldValue, newValue);
+  }
+
+  spinner.text = `Initialized ${appConfig.targetName} from ${appConfig.templateName}`;
+}
+
+async function replaceInAllFiles(dir: string, oldValue: string, newValue: string): Promise<void> {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === "node_modules") {
+        continue;
+      }
+      await replaceInAllFiles(fullPath, oldValue, newValue);
+      continue;
     }
-    appSpinner.succeed(chalk.green(`App ${appName} initialized successfully!`));
-  } else {
-    appSpinner.fail("Could not find web-template source path.");
+
+    if (!entry.isFile()) {
+      continue;
+    }
+
+    const ext = path.extname(entry.name).toLowerCase();
+    const isEnvFile = entry.name.startsWith(".env");
+    if (!(TEXT_EXTENSIONS.has(ext) || isEnvFile)) {
+      continue;
+    }
+
+    const content = await fs.readFile(fullPath, "utf-8");
+    if (!content.includes(oldValue)) {
+      continue;
+    }
+
+    await fs.writeFile(fullPath, content.split(oldValue).join(newValue), "utf-8");
   }
 }
