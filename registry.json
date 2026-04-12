@@ -27,10 +27,12 @@
       "description": "",
       "type": "app",
       "dependencies": [
+        "@repo/share-auth",
         "@countrystatecity/countries",
         "@repo/server-template",
         "@repo/share-ui",
         "@tanstack/react-query",
+        "hono",
         "next"
       ],
       "devDependencies": [
@@ -47,11 +49,13 @@
       "description": "",
       "type": "app",
       "dependencies": [
+        "@repo/share-auth",
         "ali-oss",
         "@hono/node-server",
         "@hono/standard-validator",
         "@hono/swagger-ui",
         "drizzle-orm",
+        "hono",
         "hono-openapi",
         "pg",
         "pino",
@@ -66,6 +70,36 @@
         "pino-pretty",
         "tsx",
         "typescript"
+      ]
+    },
+    "server-auth": {
+      "name": "server-auth",
+      "path": "template/apps/server-auth",
+      "description": "",
+      "type": "app",
+      "dependencies": [
+        "@repo/share-auth",
+        "@hono/zod-validator",
+        "@repo/share-ui",
+        "@scalar/hono-api-reference",
+        "@tanstack/react-form",
+        "@tanstack/react-query",
+        "@tanstack/react-query-devtools",
+        "ahooks",
+        "better-auth",
+        "hono",
+        "hono-openapi",
+        "jotai",
+        "jose",
+        "next",
+        "pg",
+        "tailwind-merge",
+        "zod"
+      ],
+      "devDependencies": [
+        "@repo/biome-config",
+        "@repo/typescript-config",
+        "@types/pg"
       ]
     }
   },
@@ -96,6 +130,18 @@
       "type": "package",
       "dependencies": [],
       "devDependencies": []
+    },
+    "share-auth": {
+      "name": "share-auth",
+      "path": "template/packages/share-auth",
+      "description": "",
+      "type": "package",
+      "dependencies": [],
+      "devDependencies": [
+        "@repo/typescript-config",
+        "@types/node",
+        "typescript"
+      ]
     },
     "share-backend": {
       "name": "share-backend",
