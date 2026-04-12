@@ -74,6 +74,9 @@ oc init my-monorepo-name
 # 添加 一个web应用
 oc add app web-template my-web-app
 
+# 添加 一个hono服务端应用
+oc add app server-template server-api
+
 # 同步 前端共享库
 oc sync package share-frontend
 
