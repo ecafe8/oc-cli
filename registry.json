@@ -47,6 +47,7 @@
       "description": "",
       "type": "app",
       "dependencies": [
+        "ali-oss",
         "@hono/node-server",
         "@hono/standard-validator",
         "@hono/swagger-ui",
@@ -103,7 +104,6 @@
       "type": "package",
       "dependencies": [
         "@joplin/turndown-plugin-gfm",
-        "ali-oss",
         "mammoth",
         "pdf-parse",
         "radash",
