@@ -103,6 +103,7 @@
       "type": "package",
       "dependencies": [
         "@joplin/turndown-plugin-gfm",
+        "ali-oss",
         "mammoth",
         "pdf-parse",
         "radash",
