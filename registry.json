@@ -21,6 +21,34 @@
     ]
   },
   "apps": {
+    "web-docs": {
+      "name": "web-docs",
+      "path": "template/apps/web-docs",
+      "description": "",
+      "type": "app",
+      "dependencies": [
+        "beautiful-mermaid",
+        "fumadocs-core",
+        "fumadocs-mdx",
+        "fumadocs-ui",
+        "lucide-react",
+        "mermaid",
+        "next",
+        "next-themes",
+        "react",
+        "react-dom"
+      ],
+      "devDependencies": [
+        "@tailwindcss/postcss",
+        "@types/mdx",
+        "@types/node",
+        "@types/react",
+        "@types/react-dom",
+        "postcss",
+        "tailwindcss",
+        "typescript"
+      ]
+    },
     "web-template": {
       "name": "web-template",
       "path": "template/apps/web-template",
@@ -177,6 +205,8 @@
         "@countrystatecity/countries",
         "@floating-ui/react",
         "@headless-tree/core",
+        "@huggingface/transformers",
+        "@pinyin-pro/data",
         "@radix-ui/react-dialog",
         "@radix-ui/react-hover-card",
         "@radix-ui/react-slot",
@@ -198,10 +228,12 @@
         "lucide-react",
         "media-chrome",
         "motion",
+        "pinyin-pro",
         "radix-ui",
         "react-icons",
         "streamdown",
         "tailwind-merge",
+        "tiktoken",
         "tw-animate-css",
         "vaul"
       ],
